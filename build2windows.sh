@@ -1,1 +1,1 @@
-GOOS=windows go build .
+GOOS=windows go build -o out/go-play-cli.exe .

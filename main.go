@@ -6,15 +6,13 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"sync"
 )
 
-func main() {
-	if len(os.Args) > 2 {
-		fmt.Println("wrong")
-		return
-	}
+func GoGames(arg string, wg *sync.WaitGroup) {
+	defer wg.Done()
 
-	switch os.Args[1] {
+	switch arg {
 	case "dnf":
 		if runtime.GOOS == "windows" {
 			// 在 Windows 上使用 PowerShell 按顺序执行两个脚本
@@ -26,7 +24,7 @@ func main() {
 			}
 		} else if runtime.GOOS == "linux" {
 			// 在 Linux 上使用 bash 按顺序执行两个脚本
-			cmd := exec.Command("bash", "-c", "echo hello && echo dnf??")
+			cmd := exec.Command("bash", "-c", "echo go dnf!")
 			if Output, err := cmd.CombinedOutput(); err != nil {
 				log.Println(err)
 			} else {
@@ -35,10 +33,63 @@ func main() {
 		} else {
 			fmt.Println("Unsupported OS")
 		}
+
 	case "lol":
-		// 这里可以添加 lol 的处理逻辑
+		if runtime.GOOS == "windows" {
+			// 在 Windows 上使用 PowerShell 按顺序执行两个脚本
+			cmd := exec.Command("powershell", "-Command", "cd $env:USERPROFILE\\Desktop; ./RiotClientServices.lnk")
+			if Output, err := cmd.CombinedOutput(); err != nil {
+				log.Println(err)
+			} else {
+				log.Println(string(Output))
+			}
+		} else if runtime.GOOS == "linux" {
+			// 在 Linux 上使用 bash 按顺序执行两个脚本
+			cmd := exec.Command("bash", "-c", "echo go riot!")
+			if Output, err := cmd.CombinedOutput(); err != nil {
+				log.Println(err)
+			} else {
+				log.Println(string(Output))
+			}
+		} else {
+			fmt.Println("Unsupported OS")
+		}
+
+	case "mi":
+		if runtime.GOOS == "windows" {
+			// 在 Windows 上使用 PowerShell 按顺序执行两个脚本
+			cmd := exec.Command("powershell", "-Command", "cd $env:USERPROFILE\\Desktop; ./mihoyo.lnk")
+			if Output, err := cmd.CombinedOutput(); err != nil {
+				log.Println(err)
+			} else {
+				log.Println(string(Output))
+			}
+		} else if runtime.GOOS == "linux" {
+			// 在 Linux 上使用 bash 按顺序执行两个脚本
+			cmd := exec.Command("bash", "-c", "echo go mihoyo!")
+			if Output, err := cmd.CombinedOutput(); err != nil {
+				log.Println(err)
+			} else {
+				log.Println(string(Output))
+			}
+		} else {
+			fmt.Println("Unsupported OS")
+		}
 	default:
 		fmt.Println("wrong arg")
 		return
 	}
+}
+
+func main() {
+
+	args := os.Args[1:]
+
+	var wg = &sync.WaitGroup{}
+
+	for _, arg := range args {
+		wg.Add(1)
+		go GoGames(arg, wg)
+	}
+	wg.Wait()
 }
