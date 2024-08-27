@@ -9,8 +9,7 @@ import (
 	"sync"
 )
 
-func GoGames(arg string, wg *sync.WaitGroup) {
-	defer wg.Done()
+func GoGames(arg string) {
 
 	switch arg {
 	case "dnf":
@@ -85,11 +84,15 @@ func main() {
 
 	args := os.Args[1:]
 
-	var wg = &sync.WaitGroup{}
+	var wg sync.WaitGroup
 
 	for _, arg := range args {
 		wg.Add(1)
-		go GoGames(arg, wg)
+		argCopy := arg //注意这一行是必须的，这涉及变量的内存分配问题
+		go func() {
+			defer wg.Done()
+			GoGames(argCopy)
+		}()
 	}
 	wg.Wait()
 }
